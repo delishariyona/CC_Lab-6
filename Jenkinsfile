@@ -38,14 +38,13 @@ pipeline {
                   -p 80:80 \
                   nginx
 
-                # VERY IMPORTANT: wait for Docker DNS
-                sleep 5
+                # WAIT until Docker DNS can resolve backend1
+                until docker exec nginx-lb getent hosts backend1; do
+                    echo "Waiting for backend1 DNS..."
+                    sleep 2
+                done
 
                 docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
-
-                # small delay before reload
-                sleep 2
-
                 docker exec nginx-lb nginx -s reload
                 '''
             }
