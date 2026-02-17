@@ -21,7 +21,8 @@ pipeline {
                 docker run -d --name backend1 --network app-network backend-app
                 docker run -d --name backend2 --network app-network backend-app
 
-                sleep 3
+                # wait for containers to fully start
+                sleep 5
                 '''
             }
         }
@@ -37,9 +38,14 @@ pipeline {
                   -p 80:80 \
                   nginx
 
-                sleep 2
+                # VERY IMPORTANT: wait for Docker DNS
+                sleep 5
 
                 docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
+
+                # small delay before reload
+                sleep 2
+
                 docker exec nginx-lb nginx -s reload
                 '''
             }
